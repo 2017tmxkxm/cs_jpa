@@ -20,7 +20,6 @@ public class Question {
     @Column(length = 200)
     private String subject;
 
-    // 글자수 제한없이 text로 넣음
     @Column(columnDefinition = "TEXT")
     private String content;
 

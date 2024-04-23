@@ -13,7 +13,6 @@ public class QuestionListViewResponse {
     private final String content;
     private final LocalDateTime createDate;
 
-    // 생성자 생성후 Question question 받은 후 get() 처리를 해줘야 한다.
     public QuestionListViewResponse(Question question) {
         this.id = question.getId();
         this.subject = question.getSubject();
