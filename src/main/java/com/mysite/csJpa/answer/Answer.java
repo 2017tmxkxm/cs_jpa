@@ -2,14 +2,13 @@ package com.mysite.csJpa.answer;
 
 import com.mysite.csJpa.question.Question;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @Entity
+@NoArgsConstructor
 public class Answer {
 
     @Id
@@ -23,4 +22,11 @@ public class Answer {
 
     @ManyToOne
     private Question question;
+
+    @Builder
+    public Answer(String content, Question question, LocalDateTime createDate) {
+        this.content = content;
+        this.question = question;
+        this.createDate = createDate;
+    }
 }
