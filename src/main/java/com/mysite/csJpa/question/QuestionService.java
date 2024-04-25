@@ -16,7 +16,7 @@ public class QuestionService {
      * 전체 질문 List
      * @return List<Question>
      */
-    public List<Question> getList() {
+    public List<Question> findAll() {
         return questionRepository.findAll();
     }
 
@@ -25,7 +25,7 @@ public class QuestionService {
      * @param id
      * @return Question
      */
-    public Question getQuestion(int id) {
+    public Question findByOne(int id) {
         return questionRepository.findById(id).orElseThrow(() -> new DataNotFoundException("question not found"));
     }
     

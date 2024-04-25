@@ -20,7 +20,7 @@ public class AnswerController {
 
     @PostMapping("/answer/create/{id}")
     public String createAnswer(@PathVariable("id") int questionId, @RequestParam(value = "content") String content) {
-        Question question = questionService.getQuestion(questionId);
+        Question question = questionService.findByOne(questionId);
         answerService.save(new AddAnswerRequest(content, question, LocalDateTime.now()));
         return String.format("redirect:/question/detail/%s", questionId);
     }

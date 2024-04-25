@@ -18,7 +18,7 @@ public class QuestionController {
 
     @GetMapping("/question/list")
     public String list(Model model) {
-        List<QuestionListViewResponse> questionList = questionService.getList().stream()
+        List<QuestionListViewResponse> questionList = questionService.findAll().stream()
                 .map(QuestionListViewResponse::new)
                 .toList();
         model.addAttribute("questionList", questionList);
@@ -27,7 +27,7 @@ public class QuestionController {
 
     @GetMapping("/question/detail/{id}")
     public String detail(Model model, @PathVariable(value = "id") int id) {
-        Question question = questionService.getQuestion(id);
+        Question question = questionService.findByOne(id);
         model.addAttribute("question", new QuestionViewResponse(question));
         return "question_detail";
     }
