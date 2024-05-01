@@ -1,9 +1,12 @@
 package com.mysite.csJpa.question;
 
 import com.mysite.csJpa.DataNotFoundException;
+import com.mysite.csJpa.answer.dto.AddAnswerRequest;
+import com.mysite.csJpa.question.dto.AddQuestionRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -27,6 +30,14 @@ public class QuestionService {
      */
     public Question findByOne(int id) {
         return questionRepository.findById(id).orElseThrow(() -> new DataNotFoundException("question not found"));
+    }
+
+    /**
+     * 질문 저장
+     * @param request - AddQuestionRequest DTO
+     */
+    public void save(AddQuestionRequest request) {
+        questionRepository.save(request.toEntity(LocalDateTime.now()));
     }
     
 }
