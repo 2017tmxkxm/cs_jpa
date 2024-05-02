@@ -1,5 +1,4 @@
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" layout:decorate="~{layout}"
-      xmlns:layout="http://www.w3.org/1999/xhtml">
+<html layout:decorate="~{layout}" xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
 
     <div class="container my-3" layout:fragment="content">
         <!-- 질문 -->
@@ -32,8 +31,13 @@
         <!-- 답변 반복 끝 -->
 
         <!-- 답변 작성 -->
-        <form th:action="@{|/answer/create/${question.id}|}" method="post" class="my-3">
-            <textarea name="content" id="content" rows="10" class="form-control"></textarea>
+        <form th:action="@{|/answer/create/${question.id}|}" th:object="${answer}" method="post" class="my-3">
+            <!-- 검증 처리 시작 -->
+            <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+                <div th:each="err : ${#fields.allErrors()}" th:text="${err}" />
+            </div>
+            <!-- 검증 처리 끝 -->
+            <textarea th:field="*{content}" id="content" rows="10" class="form-control"></textarea>
             <input type="submit" value="답변등록" class="btn btn-primary my-2">
         </form>
     </div>

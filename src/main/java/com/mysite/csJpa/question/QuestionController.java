@@ -1,5 +1,6 @@
 package com.mysite.csJpa.question;
 
+import com.mysite.csJpa.answer.dto.AddAnswerRequest;
 import com.mysite.csJpa.question.dto.AddQuestionRequest;
 import com.mysite.csJpa.question.dto.QuestionListViewResponse;
 import com.mysite.csJpa.question.dto.QuestionViewResponse;
@@ -30,7 +31,7 @@ public class QuestionController {
     }
 
     @GetMapping("/question/detail/{id}")
-    public String detail(Model model, @PathVariable(value = "id") int id) {
+    public String detail(Model model, @PathVariable(value = "id") int id, @ModelAttribute(value = "answer") AddAnswerRequest answer) {
         Question question = questionService.findByOne(id);
         model.addAttribute("question", new QuestionViewResponse(question));
         return "question_detail";
