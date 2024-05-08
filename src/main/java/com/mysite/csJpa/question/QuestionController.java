@@ -7,6 +7,7 @@ import com.mysite.csJpa.question.dto.QuestionViewResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,11 +23,11 @@ public class QuestionController {
     private final QuestionService questionService;
 
     @GetMapping("/question/list")
-    public String list(Model model) {
-        List<QuestionListViewResponse> questionList = questionService.findAll().stream()
-                .map(QuestionListViewResponse::new)
-                .toList();
-        model.addAttribute("questionList", questionList);
+    public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page) {
+
+        Page<QuestionListViewResponse> paging = questionService.findAll(page);
+
+        model.addAttribute("paging", paging);
         return "question_list";
     }
 
