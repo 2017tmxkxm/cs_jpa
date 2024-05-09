@@ -31,10 +31,12 @@ public class Question {
     private List<Answer> answerList;
 
     @Builder
-    public Question(String content, String subject, LocalDateTime createDate) {
+    public Question(int id, String content, String subject, LocalDateTime createDate, List<Answer> answerList) {
+        this.id = id;
         this.content = content;
         this.subject = subject;
         this.createDate = createDate;
+        this.answerList = answerList;
     }
 
 }
