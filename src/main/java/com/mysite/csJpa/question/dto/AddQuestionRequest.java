@@ -1,6 +1,7 @@
 package com.mysite.csJpa.question.dto;
 
 import com.mysite.csJpa.question.Question;
+import com.mysite.csJpa.user.SiteUser;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -21,12 +22,14 @@ public class AddQuestionRequest {
     private String subject;
     @NotEmpty(message = "내용은 필수 항목입니다.")
     private String content;
+    private SiteUser author;
 
-    public Question toEntity(LocalDateTime createDate) {
+    public Question toEntity(LocalDateTime createDate, SiteUser author) {
         return Question.builder()
                 .subject(subject)
                 .content(content)
                 .createDate(createDate)
+                .author(author)
                 .build();
     }
 }

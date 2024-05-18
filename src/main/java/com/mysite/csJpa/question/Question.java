@@ -2,6 +2,7 @@ package com.mysite.csJpa.question;
 
 
 import com.mysite.csJpa.answer.Answer;
+import com.mysite.csJpa.user.SiteUser;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,13 +31,17 @@ public class Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     private List<Answer> answerList;
 
+    @ManyToOne
+    private SiteUser author;
+
     @Builder
-    public Question(int id, String content, String subject, LocalDateTime createDate, List<Answer> answerList) {
+    public Question(int id, String content, String subject, LocalDateTime createDate, List<Answer> answerList, SiteUser author) {
         this.id = id;
         this.content = content;
         this.subject = subject;
         this.createDate = createDate;
         this.answerList = answerList;
+        this.author = author;
     }
 
 }
