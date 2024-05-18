@@ -3,6 +3,7 @@ package com.mysite.csJpa.question;
 import com.mysite.csJpa.DataNotFoundException;
 import com.mysite.csJpa.question.dto.AddQuestionRequest;
 import com.mysite.csJpa.question.dto.QuestionListViewResponse;
+import com.mysite.csJpa.user.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,8 +43,8 @@ public class QuestionService {
      * 질문 저장
      * @param request - AddQuestionRequest DTO
      */
-    public void save(AddQuestionRequest request) {
-        questionRepository.save(request.toEntity(LocalDateTime.now()));
+    public void save(AddQuestionRequest request, SiteUser siteUser) {
+        questionRepository.save(request.toEntity(LocalDateTime.now(), siteUser));
     }
 
     /**
