@@ -27,10 +27,15 @@ public class Answer {
     @ManyToOne
     private SiteUser author;
 
+    private LocalDateTime modifyDate;
+
     @Builder
-    public Answer(String content, Question question, LocalDateTime createDate, SiteUser author) {
+    public Answer(String content, Question question, LocalDateTime createDate, SiteUser author, LocalDateTime modifyDate, int id) {
         this.content = content;
         this.question = question;
         this.createDate = createDate;
+        this.modifyDate = modifyDate;
+        this.id = id;
+        this.author = author;
     }
 }
