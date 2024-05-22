@@ -34,14 +34,17 @@ public class Question {
     @ManyToOne
     private SiteUser author;
 
+    private LocalDateTime modifyDate;
+
     @Builder
-    public Question(int id, String content, String subject, LocalDateTime createDate, List<Answer> answerList, SiteUser author) {
+    public Question(int id, String content, String subject, LocalDateTime createDate, List<Answer> answerList, SiteUser author, LocalDateTime modifyDate) {
         this.id = id;
         this.content = content;
         this.subject = subject;
         this.createDate = createDate;
         this.answerList = answerList;
         this.author = author;
+        this.modifyDate = modifyDate;
     }
 
 }
