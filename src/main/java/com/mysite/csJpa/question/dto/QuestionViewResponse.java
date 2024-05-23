@@ -17,6 +17,7 @@ public class QuestionViewResponse {
     private final List<Answer> answerList;
     private final LocalDateTime createDate;
     private final SiteUser author;
+    private final LocalDateTime modifyDate;
 
     public QuestionViewResponse(Question question) {
         this.id = question.getId();
@@ -25,5 +26,6 @@ public class QuestionViewResponse {
         this.answerList = question.getAnswerList();
         this.createDate = question.getCreateDate();
         this.author = question.getAuthor();
+        this.modifyDate = question.getModifyDate();
     }
 }
