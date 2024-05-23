@@ -3,8 +3,11 @@ package com.mysite.csJpa.question;
 import com.mysite.csJpa.DataNotFoundException;
 import com.mysite.csJpa.question.dto.AddQuestionRequest;
 import com.mysite.csJpa.question.dto.QuestionListViewResponse;
+import com.mysite.csJpa.question.dto.QuestionViewResponse;
+import com.mysite.csJpa.question.dto.UpdateQuestionRequest;
 import com.mysite.csJpa.user.SiteUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +17,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
@@ -32,6 +37,7 @@ public class QuestionService {
 
     /**
      * 질문 상세
+     *
      * @param id
      * @return Question
      */
@@ -57,6 +63,34 @@ public class QuestionService {
         sorts.add(Sort.Order.desc("createDate"));
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
         return questionRepository.findAll(pageable).map(QuestionListViewResponse::new);
+    }
+
+    /**
+     * 질문 수정
+     * @param question
+     * @param subject
+     * @param content
+     */
+    public void update(Question question, String subject, String content) {
+        UpdateQuestionRequest updateQuestionRequest
+                = UpdateQuestionRequest.builder()
+                    .id(question.getId())
+                    .subject(subject)
+                    .content(content)
+                    .author(question.getAuthor())
+                    .createDate(question.getCreateDate())
+                    .modifyDate(LocalDateTime.now())
+                    .build();
+        questionRepository.save(updateQuestionRequest.toEntity());
+    }
+
+    /**
+     * 질문 삭제
+     * @param id
+     */
+    public void delete(int id) {
+        Question question = questionRepository.findById(id).orElseThrow(() -> new DataNotFoundException("not found : " + id));
+        questionRepository.delete(question);
     }
 
 }
