@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -17,6 +18,7 @@ public class UpdateAnswerRequest {
     private Question question;
     private LocalDateTime createDate;
     private SiteUser author;
+    Set<SiteUser> voter;
 
     public Answer toEntity() {
         return Answer.builder()
@@ -26,6 +28,7 @@ public class UpdateAnswerRequest {
                 .author(author)
                 .createDate(createDate)
                 .question(question)
+                .voter(voter)
                 .build();
     }
 }

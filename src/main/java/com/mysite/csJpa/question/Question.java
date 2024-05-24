@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -36,8 +37,11 @@ public class Question {
 
     private LocalDateTime modifyDate;
 
+    @ManyToMany
+    Set<SiteUser> voter;
+
     @Builder
-    public Question(int id, String content, String subject, LocalDateTime createDate, List<Answer> answerList, SiteUser author, LocalDateTime modifyDate) {
+    public Question(int id, String content, String subject, LocalDateTime createDate, List<Answer> answerList, SiteUser author, LocalDateTime modifyDate, Set<SiteUser> voter) {
         this.id = id;
         this.content = content;
         this.subject = subject;
@@ -45,6 +49,7 @@ public class Question {
         this.answerList = answerList;
         this.author = author;
         this.modifyDate = modifyDate;
+        this.voter = voter;
     }
 
 }

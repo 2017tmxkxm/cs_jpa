@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 public class QuestionViewResponse {
@@ -18,6 +19,7 @@ public class QuestionViewResponse {
     private final LocalDateTime createDate;
     private final SiteUser author;
     private final LocalDateTime modifyDate;
+    Set<SiteUser> voter;
 
     public QuestionViewResponse(Question question) {
         this.id = question.getId();
@@ -27,5 +29,6 @@ public class QuestionViewResponse {
         this.createDate = question.getCreateDate();
         this.author = question.getAuthor();
         this.modifyDate = question.getModifyDate();
+        this.voter = question.getVoter();
     }
 }

@@ -5,6 +5,7 @@ import com.mysite.csJpa.user.SiteUser;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -15,15 +16,17 @@ public class UpdateQuestionRequest {
     private Integer id;
     private LocalDateTime createDate;
     private SiteUser author;
+    private Set<SiteUser> voter;
 
     public Question toEntity() {
         return Question.builder()
+                .id(id)
                 .subject(subject)
                 .content(content)
-                .modifyDate(modifyDate)
-                .id(id)
-                .createDate(createDate)
                 .author(author)
+                .createDate(createDate)
+                .modifyDate(modifyDate)
+                .voter(voter)
                 .build();
     }
 }

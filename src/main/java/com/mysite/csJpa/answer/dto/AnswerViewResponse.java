@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -16,4 +17,5 @@ public class AnswerViewResponse {
     private Question question;
     private SiteUser author;
     private LocalDateTime modifyDate;
+    Set<SiteUser> voter;
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -29,13 +30,17 @@ public class Answer {
 
     private LocalDateTime modifyDate;
 
+    @ManyToMany
+    Set<SiteUser> voter;
+
     @Builder
-    public Answer(String content, Question question, LocalDateTime createDate, SiteUser author, LocalDateTime modifyDate, int id) {
+    public Answer(String content, Question question, LocalDateTime createDate, SiteUser author, LocalDateTime modifyDate, int id, Set<SiteUser> voter) {
         this.content = content;
         this.question = question;
         this.createDate = createDate;
         this.modifyDate = modifyDate;
         this.id = id;
         this.author = author;
+        this.voter = voter;
     }
 }
