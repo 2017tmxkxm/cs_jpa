@@ -1,6 +1,7 @@
 package com.mysite.csJpa.question;
 
 import com.mysite.csJpa.DataNotFoundException;
+import com.mysite.csJpa.answer.dto.AddAnswerRequest;
 import com.mysite.csJpa.question.dto.AddQuestionRequest;
 import com.mysite.csJpa.question.dto.QuestionListViewResponse;
 import com.mysite.csJpa.question.dto.QuestionViewResponse;
@@ -91,6 +92,27 @@ public class QuestionService {
     public void delete(int id) {
         Question question = questionRepository.findById(id).orElseThrow(() -> new DataNotFoundException("not found : " + id));
         questionRepository.delete(question);
+    }
+
+    /**
+     * 질문 추천
+     * @param question
+     * @param siteUser
+     */
+    public void vote(Question question, SiteUser siteUser) {
+        question.getVoter().add(siteUser);
+        UpdateQuestionRequest updateQuestionRequest
+                = UpdateQuestionRequest.builder()
+                    .id(question.getId())
+                    .subject(question.getSubject())
+                    .content(question.getContent())
+                    .createDate(question.getCreateDate())
+                    .modifyDate(question.getModifyDate())
+                    .voter(question.getVoter())
+                    .author(question.getAuthor())
+                    .build();
+
+        questionRepository.save(updateQuestionRequest.toEntity());
     }
 
 }
