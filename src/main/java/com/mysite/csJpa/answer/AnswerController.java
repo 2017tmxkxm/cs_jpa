@@ -53,8 +53,10 @@ public class AnswerController {
                 .createDate(LocalDateTime.now())
                 .author(userService.find(principal.getName()))
                 .build();
-        answerService.save(addAnswerRequest);
-        return String.format("redirect:/question/detail/%s", questionId);
+
+        AnswerViewResponse answerSaved = answerService.save(addAnswerRequest);
+
+        return String.format("redirect:/question/detail/%s#answer_%s", questionId, answerSaved.getId());
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -85,7 +87,7 @@ public class AnswerController {
         }
 
         answerService.answerUpdate(answer, request);
-        return String.format("redirect:/question/detail/%s", answer.getQuestion().getId());
+        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(), answer.getId());
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -105,6 +107,6 @@ public class AnswerController {
         AnswerViewResponse answerViewResponse = answerService.findByOne(id);
         SiteUser siteUser = userService.find(principal.getName());
         answerService.answerVote(answerViewResponse, siteUser);
-        return String.format("redirect:/question/detail/%s", answerViewResponse.getQuestion().getId());
+        return String.format("redirect:/question/detail/%sanswer_%s", answerViewResponse.getQuestion().getId(), answerViewResponse.getId());
     }
 }

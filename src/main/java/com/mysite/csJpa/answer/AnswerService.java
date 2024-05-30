@@ -22,8 +22,15 @@ public class AnswerService {
      * 답변 저장
      * @param request
      */
-    public void save(AddAnswerRequest request) {
-        answerRepository.save(request.toEntity());
+    public AnswerViewResponse save(AddAnswerRequest request) {
+        Answer saved = answerRepository.save(request.toEntity());
+        return AnswerViewResponse.builder()
+                .content(saved.getContent())
+                .createDate(saved.getCreateDate())
+                .question(saved.getQuestion())
+                .author(saved.getAuthor())
+                .id(saved.getId())
+                .build();
     }
 
     /**
