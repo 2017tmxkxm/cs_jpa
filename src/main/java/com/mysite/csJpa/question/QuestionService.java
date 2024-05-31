@@ -1,18 +1,21 @@
 package com.mysite.csJpa.question;
 
 import com.mysite.csJpa.DataNotFoundException;
+import com.mysite.csJpa.answer.Answer;
 import com.mysite.csJpa.answer.dto.AddAnswerRequest;
 import com.mysite.csJpa.question.dto.AddQuestionRequest;
 import com.mysite.csJpa.question.dto.QuestionListViewResponse;
 import com.mysite.csJpa.question.dto.QuestionViewResponse;
 import com.mysite.csJpa.question.dto.UpdateQuestionRequest;
 import com.mysite.csJpa.user.SiteUser;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -59,11 +62,11 @@ public class QuestionService {
      * @param page
      * @return Page<QuestionListViewResponse>
      */
-    public Page<QuestionListViewResponse> findAll(int page) {
+    public Page<QuestionListViewResponse> findAll(int page, String kw) {
         List<Sort.Order> sorts= new ArrayList<>();
         sorts.add(Sort.Order.desc("createDate"));
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-        return questionRepository.findAll(pageable).map(QuestionListViewResponse::new);
+        return questionRepository.findAll(kw, pageable).map(QuestionListViewResponse::new);
     }
 
     /**
