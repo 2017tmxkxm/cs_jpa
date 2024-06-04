@@ -3,6 +3,7 @@ package com.mysite.csJpa.answer;
 import com.mysite.csJpa.answer.dto.*;
 import com.mysite.csJpa.question.Question;
 import com.mysite.csJpa.question.QuestionService;
+import com.mysite.csJpa.question.dto.QuestionResponse;
 import com.mysite.csJpa.user.SiteUser;
 import com.mysite.csJpa.user.UserService;
 import jakarta.validation.Valid;
@@ -38,7 +39,7 @@ public class AnswerController {
             , Model model
             , Principal principal) {
 
-        Question question = questionService.findByOne(questionId);
+        QuestionResponse question = questionService.findByOne(questionId);
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("question", question);
@@ -47,12 +48,11 @@ public class AnswerController {
 
         AnswerRequest addAnswerRequest = AnswerRequest.builder()
                 .content(request.getContent())
-                .question(question)
                 .createDate(LocalDateTime.now())
                 .author(userService.find(principal.getName()))
                 .build();
 
-        AnswerResponse answerSaved = answerService.save(addAnswerRequest);
+        AnswerResponse answerSaved = answerService.save(addAnswerRequest, question);
 
         return String.format("redirect:/question/detail/%s#answer_%s", questionId, answerSaved.getId());
     }

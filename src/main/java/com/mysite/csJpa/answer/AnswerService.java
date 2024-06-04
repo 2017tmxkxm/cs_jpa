@@ -2,6 +2,8 @@ package com.mysite.csJpa.answer;
 
 import com.mysite.csJpa.DataNotFoundException;
 import com.mysite.csJpa.answer.dto.*;
+import com.mysite.csJpa.question.Question;
+import com.mysite.csJpa.question.dto.QuestionResponse;
 import com.mysite.csJpa.user.SiteUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +22,9 @@ public class AnswerService {
      * 답변 저장
      * @param request
      */
-    public AnswerResponse save(AnswerRequest request) {
-        Answer saved = answerRepository.save(request.toEntityWithoutId());
+    public AnswerResponse save(AnswerRequest request, QuestionResponse questionResponse) {
+        Question question = questionResponse.toEntity();
+        Answer saved = answerRepository.save(request.toEntityWithoutId(question));
         return AnswerResponse.builder()
                 .content(saved.getContent())
                 .createDate(saved.getCreateDate())

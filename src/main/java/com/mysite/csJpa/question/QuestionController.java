@@ -1,10 +1,8 @@
 package com.mysite.csJpa.question;
 
 import com.mysite.csJpa.answer.dto.AddAnswerRequest;
-import com.mysite.csJpa.question.dto.AddQuestionRequest;
-import com.mysite.csJpa.question.dto.QuestionListViewResponse;
-import com.mysite.csJpa.question.dto.QuestionViewResponse;
-import com.mysite.csJpa.question.dto.UpdateQuestionRequest;
+import com.mysite.csJpa.answer.dto.AnswerRequest;
+import com.mysite.csJpa.question.dto.*;
 import com.mysite.csJpa.user.SiteUser;
 import com.mysite.csJpa.user.UserService;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -37,7 +35,7 @@ public class QuestionController {
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page
                         , @RequestParam(value="kw", defaultValue = "") String kw) {
 
-        Page<QuestionListViewResponse> paging = questionService.findAll(page, kw);
+        Page<QuestionResponse> paging = questionService.findAll(page, kw);
 
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
@@ -45,37 +43,36 @@ public class QuestionController {
     }
 
     @GetMapping("/question/detail/{id}")
-    public String detail(Model model, @PathVariable(value = "id") int id, @ModelAttribute(value = "answer") AddAnswerRequest answer) {
-        Question question = questionService.findByOne(id);
-        model.addAttribute("question", new QuestionViewResponse(question));
+    public String detail(Model model, @PathVariable(value = "id") int id, @ModelAttribute(value = "answer") AnswerRequest answerRequest) {
+        QuestionResponse question = questionService.findByOne(id);
+        model.addAttribute("question", question);
         return "question_detail";
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/question/add")
-    public String addForm(Model model) {
-        model.addAttribute("question", new AddQuestionRequest());
+    public String addForm(@ModelAttribute("question") QuestionRequest request) {
         return "question_addForm";
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/question/add")
-    public String addQuestion(@Valid @ModelAttribute("question") AddQuestionRequest question, BindingResult bindingResult, Principal principal) {
+    public String addQuestion(@Valid @ModelAttribute("question") QuestionRequest request, BindingResult bindingResult, Principal principal) {
         if (bindingResult.hasErrors()) {
             return "question_addForm";
         }
-        questionService.save(question, userService.find(principal.getName()));
+        questionService.save(request, userService.find(principal.getName()));
         return "redirect:/question/list";
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/question/update/{id}")
-    public String updateQuestion(@ModelAttribute("question") UpdateQuestionRequest request, @PathVariable("id") Integer id, Principal principal, Model model) {
-        Question question = questionService.findByOne(id);
+    public String updateQuestion(@ModelAttribute("question") QuestionRequest request, @PathVariable("id") Integer id, Principal principal, Model model) {
+        QuestionResponse question = questionService.findByOne(id);
         if(!question.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
-        request = UpdateQuestionRequest.builder()
+        request = QuestionRequest.builder()
                 .subject(question.getSubject())
                 .content(question.getContent())
                 .build();
@@ -85,13 +82,13 @@ public class QuestionController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/question/update/{id}")
-    public String updateQuestion(@Valid @ModelAttribute("question") UpdateQuestionRequest request
+    public String updateQuestion(@Valid @ModelAttribute("question") QuestionRequest request
             , BindingResult bindingResult, Principal principal
             , @PathVariable("id") Integer id) {
         if(bindingResult.hasErrors()) {
             return "question_addForm";
         }
-        Question question = questionService.findByOne(id);
+        QuestionResponse question = questionService.findByOne(id);
         if(!question.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
@@ -103,7 +100,7 @@ public class QuestionController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/question/delete/{id}")
     public String deleteQuestion(@PathVariable(value = "id") Integer id, Principal principal) {
-        Question question = questionService.findByOne(id);
+        QuestionResponse question = questionService.findByOne(id);
         if(!question.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
         }
@@ -114,7 +111,7 @@ public class QuestionController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/question/vote/{id}")
     public String questionVote(Principal principal, @PathVariable("id") Integer id) {
-        Question question = questionService.findByOne(id);
+        QuestionResponse question = questionService.findByOne(id);
         SiteUser siteUser = userService.find(principal.getName());
         questionService.vote(question, siteUser);
         return String.format("redirect:/question/detail/%s", id);
