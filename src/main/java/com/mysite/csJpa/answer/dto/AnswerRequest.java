@@ -2,10 +2,12 @@ package com.mysite.csJpa.answer.dto;
 
 import com.mysite.csJpa.answer.Answer;
 import com.mysite.csJpa.question.Question;
+import com.mysite.csJpa.question.dto.QuestionResponse;
 import com.mysite.csJpa.user.SiteUser;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.expression.spel.ast.QualifiedIdentifier;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -35,7 +37,7 @@ public class AnswerRequest {
                 .build();
     }
 
-    public Answer toEntityWithoutId() {
+    public Answer toEntityWithoutId(Question question) {
         return Answer.builder()
                 .content(content)
                 .question(question)
