@@ -1,9 +1,7 @@
 package com.mysite.csJpa.answer;
 
 import com.mysite.csJpa.DataNotFoundException;
-import com.mysite.csJpa.answer.dto.AddAnswerRequest;
-import com.mysite.csJpa.answer.dto.AnswerViewResponse;
-import com.mysite.csJpa.answer.dto.UpdateAnswerRequest;
+import com.mysite.csJpa.answer.dto.*;
 import com.mysite.csJpa.user.SiteUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +20,9 @@ public class AnswerService {
      * 답변 저장
      * @param request
      */
-    public AnswerViewResponse save(AddAnswerRequest request) {
-        Answer saved = answerRepository.save(request.toEntity());
-        return AnswerViewResponse.builder()
+    public AnswerResponse save(AnswerRequest request) {
+        Answer saved = answerRepository.save(request.toEntityWithoutId());
+        return AnswerResponse.builder()
                 .content(saved.getContent())
                 .createDate(saved.getCreateDate())
                 .question(saved.getQuestion())
@@ -38,9 +36,9 @@ public class AnswerService {
      * @param id
      * @return AnswerViewResponse
      */
-    public AnswerViewResponse findByOne(int id) {
+    public AnswerResponse findByOne(int id) {
         Answer answer = answerRepository.findById(id).orElseThrow(() -> new DataNotFoundException("answer not found"));
-        return AnswerViewResponse.builder()
+        return AnswerResponse.builder()
                 .content(answer.getContent())
                 .id(answer.getId())
                 .author(answer.getAuthor())
@@ -52,19 +50,19 @@ public class AnswerService {
 
     /**
      * 답변 수정
-     * @param answerViewResponse
-     * @param updateAnswerRequest
+     * @param response
+     * @param request
      */
-    public void answerUpdate(AnswerViewResponse answerViewResponse, UpdateAnswerRequest updateAnswerRequest) {
-        updateAnswerRequest = UpdateAnswerRequest.builder()
-                .id(answerViewResponse.getId())
-                .content(updateAnswerRequest.getContent())
-                .author(answerViewResponse.getAuthor())
-                .question(answerViewResponse.getQuestion())
-                .createDate(answerViewResponse.getCreateDate())
+    public void answerUpdate(AnswerResponse response, AnswerRequest request) {
+        request = AnswerRequest.builder()
+                .id(response.getId())
+                .content(request.getContent())
+                .author(response.getAuthor())
+                .question(response.getQuestion())
+                .createDate(response.getCreateDate())
                 .modifyDate(LocalDateTime.now())
                 .build();
-        answerRepository.save(updateAnswerRequest.toEntity());
+        answerRepository.save(request.toEntityWithId());
     }
 
     /**
@@ -81,10 +79,10 @@ public class AnswerService {
      * @param request
      * @param siteUser
      */
-    public void answerVote(AnswerViewResponse request, SiteUser siteUser) {
+    public void answerVote(AnswerResponse request, SiteUser siteUser) {
         request.getVoter().add(siteUser);
-        UpdateAnswerRequest updateAnswerRequest
-                = UpdateAnswerRequest.builder()
+        AnswerRequest answerRequest
+                = AnswerRequest.builder()
                     .id(request.getId())
                     .content(request.getContent())
                     .createDate(request.getCreateDate())
@@ -94,6 +92,6 @@ public class AnswerService {
                     .question(request.getQuestion())
                     .build();
 
-        answerRepository.save(updateAnswerRequest.toEntity());
+        answerRepository.save(answerRequest.toEntityWithId());
     }
 }

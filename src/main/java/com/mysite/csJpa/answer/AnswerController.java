@@ -1,8 +1,6 @@
 package com.mysite.csJpa.answer;
 
-import com.mysite.csJpa.answer.dto.AddAnswerRequest;
-import com.mysite.csJpa.answer.dto.AnswerViewResponse;
-import com.mysite.csJpa.answer.dto.UpdateAnswerRequest;
+import com.mysite.csJpa.answer.dto.*;
 import com.mysite.csJpa.question.Question;
 import com.mysite.csJpa.question.QuestionService;
 import com.mysite.csJpa.user.SiteUser;
@@ -35,7 +33,7 @@ public class AnswerController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/answer/create/{id}")
     public String createAnswer(@PathVariable("id") int questionId
-            , @Valid @ModelAttribute(value = "answer") AddAnswerRequest answer
+            , @Valid @ModelAttribute(value = "answer") AnswerRequest request
             , BindingResult bindingResult
             , Model model
             , Principal principal) {
@@ -47,26 +45,26 @@ public class AnswerController {
             return "question_detail";
         }
 
-        AddAnswerRequest addAnswerRequest = AddAnswerRequest.builder()
-                .content(answer.getContent())
+        AnswerRequest addAnswerRequest = AnswerRequest.builder()
+                .content(request.getContent())
                 .question(question)
                 .createDate(LocalDateTime.now())
                 .author(userService.find(principal.getName()))
                 .build();
 
-        AnswerViewResponse answerSaved = answerService.save(addAnswerRequest);
+        AnswerResponse answerSaved = answerService.save(addAnswerRequest);
 
         return String.format("redirect:/question/detail/%s#answer_%s", questionId, answerSaved.getId());
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/answer/update/{id}")
-    public String answerUpdate(@ModelAttribute("answerForm") AnswerViewResponse request, @PathVariable("id") int id, Principal principal, Model model) {
-        AnswerViewResponse answer = answerService.findByOne(id);
+    public String answerUpdate(@ModelAttribute("answerForm") AnswerResponse request, @PathVariable("id") int id, Principal principal, Model model) {
+        AnswerResponse answer = answerService.findByOne(id);
         if (!answer.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
-        request = AnswerViewResponse.builder()
+        request = AnswerResponse.builder()
                 .content(answer.getContent())
                 .build();
         model.addAttribute("answerForm", request);
@@ -75,38 +73,38 @@ public class AnswerController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/answer/update/{id}")
-    public String answerUpdate(@Valid @ModelAttribute("answerForm") UpdateAnswerRequest request, BindingResult bindingResult
+    public String answerUpdate(@Valid @ModelAttribute("answerForm") AnswerRequest request, BindingResult bindingResult
             , @PathVariable("id") int id, Principal principal) {
         if (bindingResult.hasErrors()) {
             return "answer_form";
         }
 
-        AnswerViewResponse answer = answerService.findByOne(id);
-        if (!answer.getAuthor().getUsername().equals(principal.getName())) {
+        AnswerResponse answerResponse = answerService.findByOne(id);
+        if (!answerResponse.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
 
-        answerService.answerUpdate(answer, request);
-        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(), answer.getId());
+        answerService.answerUpdate(answerResponse, request);
+        return String.format("redirect:/question/detail/%s#answer_%s", answerResponse.getQuestion().getId(), answerResponse.getId());
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/answer/delete/{id}")
     public String deleteAnswer(@PathVariable(value = "id") Integer id, Principal principal) {
-        AnswerViewResponse answerViewResponse = answerService.findByOne(id);
-        if (!answerViewResponse.getAuthor().getUsername().equals(principal.getName())) {
+        AnswerResponse answerResponse = answerService.findByOne(id);
+        if (!answerResponse.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
         }
         answerService.answerDelete(id);
-        return String.format("redirect:/question/detail/%s", answerViewResponse.getQuestion().getId());
+        return String.format("redirect:/question/detail/%s", answerResponse.getQuestion().getId());
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/answer/vote/{id}")
     public String answerVote(Principal principal, @PathVariable("id") Integer id) {
-        AnswerViewResponse answerViewResponse = answerService.findByOne(id);
+        AnswerResponse answerResponse = answerService.findByOne(id);
         SiteUser siteUser = userService.find(principal.getName());
-        answerService.answerVote(answerViewResponse, siteUser);
-        return String.format("redirect:/question/detail/%sanswer_%s", answerViewResponse.getQuestion().getId(), answerViewResponse.getId());
+        answerService.answerVote(answerResponse, siteUser);
+        return String.format("redirect:/question/detail/%sanswer_%s", answerResponse.getQuestion().getId(), answerResponse.getId());
     }
 }
