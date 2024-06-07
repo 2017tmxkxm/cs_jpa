@@ -1,7 +1,9 @@
 package com.mysite.csJpa.question;
 
+import com.mysite.csJpa.answer.AnswerService;
 import com.mysite.csJpa.answer.dto.AddAnswerRequest;
 import com.mysite.csJpa.answer.dto.AnswerRequest;
+import com.mysite.csJpa.answer.dto.AnswerResponse;
 import com.mysite.csJpa.question.dto.*;
 import com.mysite.csJpa.user.SiteUser;
 import com.mysite.csJpa.user.UserService;
@@ -30,6 +32,7 @@ public class QuestionController {
 
     private final QuestionService questionService;
     private final UserService userService;
+    private final AnswerService answerService;
 
     @GetMapping("/question/list")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page
@@ -43,9 +46,12 @@ public class QuestionController {
     }
 
     @GetMapping("/question/detail/{id}")
-    public String detail(Model model, @PathVariable(value = "id") int id, @ModelAttribute(value = "answer") AnswerRequest answerRequest) {
+    public String detail(Model model, @PathVariable(value = "id") int id, @ModelAttribute(value = "answer") AnswerRequest answerRequest
+                        , @RequestParam(value = "page", defaultValue = "0") int page) {
         QuestionResponse question = questionService.findByOne(id);
+        Page<AnswerResponse> paging = answerService.findAnswerPage(id, page);
         model.addAttribute("question", question);
+        model.addAttribute("paging", paging);
         return "question_detail";
     }
 

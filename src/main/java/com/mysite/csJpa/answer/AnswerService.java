@@ -7,9 +7,15 @@ import com.mysite.csJpa.question.dto.QuestionResponse;
 import com.mysite.csJpa.user.SiteUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -96,5 +102,12 @@ public class AnswerService {
                     .build();
 
         answerRepository.save(answerRequest.toEntityWithId());
+    }
+
+    public Page<AnswerResponse> findAnswerPage(int questionId, int page) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+        return answerRepository.findByQuestionId(questionId, pageable).map(AnswerResponse::new);
     }
 }
