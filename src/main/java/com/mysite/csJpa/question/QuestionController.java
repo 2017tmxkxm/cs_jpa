@@ -4,6 +4,8 @@ import com.mysite.csJpa.answer.AnswerService;
 import com.mysite.csJpa.answer.dto.AddAnswerRequest;
 import com.mysite.csJpa.answer.dto.AnswerRequest;
 import com.mysite.csJpa.answer.dto.AnswerResponse;
+import com.mysite.csJpa.comment.CommentService;
+import com.mysite.csJpa.comment.dto.CommentResponse;
 import com.mysite.csJpa.question.dto.*;
 import com.mysite.csJpa.user.SiteUser;
 import com.mysite.csJpa.user.UserService;
@@ -33,6 +35,7 @@ public class QuestionController {
     private final QuestionService questionService;
     private final UserService userService;
     private final AnswerService answerService;
+    private final CommentService commentService;
 
     @GetMapping("/question/list")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page
@@ -48,10 +51,17 @@ public class QuestionController {
     @GetMapping("/question/detail/{id}")
     public String detail(Model model, @PathVariable(value = "id") int id, @ModelAttribute(value = "answer") AnswerRequest answerRequest
                         , @RequestParam(value = "page", defaultValue = "0") int page) {
+        // Question
         QuestionResponse question = questionService.findByOne(id);
+        // Answer
         Page<AnswerResponse> paging = answerService.findAnswerPage(id, page);
+        // Comment
+        List<CommentResponse> comment = commentService.findByQuestionId(id);
+
         model.addAttribute("question", question);
         model.addAttribute("paging", paging);
+        model.addAttribute("comment", comment);
+
         return "question_detail";
     }
 
