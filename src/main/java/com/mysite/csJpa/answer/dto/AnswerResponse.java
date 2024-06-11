@@ -6,6 +6,7 @@ import com.mysite.csJpa.user.SiteUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor  // 답변 수정시 No primary or single unique constructor found for 발생
 public class AnswerResponse {
 
     private Integer id;
