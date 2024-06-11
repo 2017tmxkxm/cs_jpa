@@ -1,11 +1,13 @@
 package com.mysite.csJpa.answer;
 
+import com.mysite.csJpa.comment.Comment;
 import com.mysite.csJpa.question.Question;
 import com.mysite.csJpa.user.SiteUser;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -33,8 +35,11 @@ public class Answer {
     @ManyToMany
     Set<SiteUser> voter;
 
+    @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE)
+    private List<Comment> commentList;
+
     @Builder
-    public Answer(String content, Question question, LocalDateTime createDate, SiteUser author, LocalDateTime modifyDate, int id, Set<SiteUser> voter) {
+    public Answer(String content, Question question, LocalDateTime createDate, SiteUser author, LocalDateTime modifyDate, int id, Set<SiteUser> voter, List<Comment> commentList) {
         this.content = content;
         this.question = question;
         this.createDate = createDate;
@@ -42,5 +47,6 @@ public class Answer {
         this.id = id;
         this.author = author;
         this.voter = voter;
+        this.commentList = commentList;
     }
 }
