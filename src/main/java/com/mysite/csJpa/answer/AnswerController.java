@@ -105,6 +105,6 @@ public class AnswerController {
         AnswerResponse answerResponse = answerService.findByOne(id);
         SiteUser siteUser = userService.find(principal.getName());
         answerService.answerVote(answerResponse, siteUser);
-        return String.format("redirect:/question/detail/%sanswer_%s", answerResponse.getQuestion().getId(), answerResponse.getId());
+        return String.format("redirect:/question/detail/%s#answer_%s", answerResponse.getQuestion().getId(), answerResponse.getId());
     }
 }
