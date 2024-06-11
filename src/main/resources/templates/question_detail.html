@@ -40,41 +40,98 @@
         <!-- 답변 개수 표시 -->
         <h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
 
-        <!-- 답변 반복 시작 -->
-        <div class="card my-3" th:each="answer : ${paging}">
-            <a th:id="|answer_${answer.id}|"></a>
-            <div class="card-body">
-                <div class="card-text" th:utext="${@markUtil.markdown(answer.content)}"></div>
-                <div class="d-flex justify-content-end">
-                    <div th:if="${answer.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
-                        <div class="mb-2">modified at</div>
-                        <div th:text="${#temporals.format(answer.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
-                    </div>
-                    <div class="badge bg-light text-dark p-2 text-start">
-                        <div class="mb-2">
-                            <span th:if="${answer.author != null}" th:text="${answer.author.username}"></span>
+        <!-- Comments section-->
+        <section class="mb-5">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <!-- 답변 등록 -->
+                    <form th:action="@{|/answer/create/${question.id}|}" th:object="${answer}" method="post" class="mb-4">
+                        <!-- 검증 처리 시작 -->
+                        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+                        <!-- 검증 처리 끝 -->
+                        <textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!" sec:authorize="isAnonymous()" disabled th:field="*{content}"></textarea>
+                        <textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!" sec:authorize="isAuthenticated()" th:field="*{content}"></textarea>
+                        <input type="submit" value="답변등록" class="btn btn-primary my-2">
+                    </form>
+                    <!-- 답변 반복 시작 -->
+                    <div class="d-flex mb-4" th:each="answer : ${paging}">
+                        <a th:id="|answer_${answer.id}|"></a>
+                        <!-- Parent comment-->
+                        <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                        <div class="ms-3">
+                            <div class="fw-bold" th:if="${answer.author != null}">
+                                [[${answer.author.username}]]
+                                <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                                   th:data-uri="@{|/answer/vote/${answer.id}|}">
+                                    추천
+                                    <span class="badge rounded-pill bg-success" th:text="${#lists.size(answer.voter)}"></span>
+                                </a>
+                                <a th:href="@{|/answer/update/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
+                                   sec:authorize="isAuthenticated()"
+                                   th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
+                                   th:text="수정"></a>
+                                <a href="javascript:void(0);" th:data-uri="@{|/answer/delete/${answer.id}|}"
+                                   class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
+                                   th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
+                                   th:text="삭제"></a>
+                                <div th:if="${answer.createDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
+                                    create at
+                                    <div th:text="${#temporals.format(answer.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+                                </div>
+                                <div th:if="${answer.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
+                                    modified at
+                                    <div th:text="${#temporals.format(answer.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
+                                </div>
+                            </div>
+                            <div th:utext="${@markUtil.markdown(answer.content)}"></div>
+                            <!-- 댓글 Modal start-->
+                            <a data-bs-toggle="modal" th:attr="href=${'#myModal'+ answer.id}">댓글쓰기</a>
+                            <div class="modal" tabindex="-1" id="myModal" data-bs-backdrop="static" data-bs-keyboard="false" th:attr="id='myModal'+${answer.id}">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Modal title</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form th:action="@{/comment/save}" method="post">
+                                            <input type="hidden" th:value="${answer.id}" th:name="answer">
+                                            <input type="hidden" th:value="${question.id}" th:name="question">
+                                            <div class="modal-body">
+                                                <textarea class="form-control" rows="3" id="content" th:name="content" required></textarea>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="save btn btn-primary">Save changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 댓글 Modal end-->
+
+                            <!-- Child comment -->
+                            <div class="d-flex mt-4" th:each="comment : ${comment}" th:if="${comment.answer.id == answer.id}">
+                                <a th:id="|comment_${comment.id}|"></a>
+                                <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                <div class="ms-3">
+                                    <div class="fw-bold">[[${comment.author.username}]]
+                                        <a th:href="@{|/comment/update/${comment.id}|}" class="btn btn-sm btn-outline-secondary"
+                                           sec:authorize="isAuthenticated()"
+                                           th:if="${comment.author != null and #authentication.getPrincipal().getUsername() == comment.author.username}"
+                                           th:text="수정"></a>
+                                        <a href="javascript:void(0);" th:data-uri="@{|/comment/delete/${comment.id}|}"
+                                           class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
+                                           th:if="${comment.author != null and #authentication.getPrincipal().getUsername() == comment.author.username}"
+                                           th:text="삭제"></a>
+                                    </div>
+                                    [[${comment.content}]]
+                                </div>
+                            </div>
                         </div>
-                        <div th:text="${#temporals.format(answer.createDate, 'yyyy-MM-dd HH:mm')}"></div>
                     </div>
-                </div>
-                <div class="my-3">
-                    <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
-                       th:data-uri="@{|/answer/vote/${answer.id}|}">
-                        추천
-                        <span class="badge rounded-pill bg-success" th:text="${#lists.size(answer.voter)}"></span>
-                    </a>
-                    <a th:href="@{|/answer/update/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
-                       sec:authorize="isAuthenticated()"
-                       th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
-                       th:text="수정"></a>
-                    <a href="javascript:void(0);" th:data-uri="@{|/answer/delete/${answer.id}|}"
-                       class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
-                       th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
-                       th:text="삭제"></a>
                 </div>
             </div>
-        </div>
-        <!-- 답변 반복 끝 -->
+        </section>
 
         <!-- 페이징처리 시작 -->
         <div th:if="${!paging.isEmpty()}">
@@ -102,18 +159,6 @@
             <input type="hidden" id="page" name="page" th:value="${paging.number}">
         </form>
 
-        <!-- 답변 작성 -->
-        <form th:action="@{|/answer/create/${question.id}|}" th:object="${answer}" method="post" class="my-3">
-            <input  type = "hidden"
-                    name = "${_csrf.parameterName}"
-                    value = "${_csrf.token}" />
-            <!-- 검증 처리 시작 -->
-            <div th:replace="~{form_errors :: formErrorsFragment}"></div>
-            <!-- 검증 처리 끝 -->
-            <textarea sec:authorize="isAnonymous()" disabled th:field="*{content}" class="form-control" rows="10"></textarea>
-            <textarea sec:authorize="isAuthenticated()" th:field="*{content}" class="form-control" rows="10"></textarea>
-            <input type="submit" value="답변등록" class="btn btn-primary my-2">
-        </form>
     </div>
 
     <script layout:fragment="script" type="text/javascript">
