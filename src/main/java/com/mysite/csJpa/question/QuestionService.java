@@ -1,25 +1,21 @@
 package com.mysite.csJpa.question;
 
 import com.mysite.csJpa.DataNotFoundException;
-import com.mysite.csJpa.answer.Answer;
-import com.mysite.csJpa.answer.dto.AddAnswerRequest;
+import com.mysite.csJpa.category.Category;
+import com.mysite.csJpa.category.dto.CategoryResponse;
 import com.mysite.csJpa.question.dto.*;
 import com.mysite.csJpa.user.SiteUser;
-import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
@@ -36,19 +32,30 @@ public class QuestionService {
     public QuestionResponse findByOne(int id) {
         Question question = questionRepository.findById(id).orElseThrow(() -> new DataNotFoundException("question not found"));
 
-        return new QuestionResponse(
-                question.getId(), question.getSubject(), question.getContent(), question.getAnswerList()
-                , question.getAuthor(), question.getCreateDate(), question.getModifyDate(), question.getVoter());
+        return QuestionResponse.builder()
+                .id(question.getId())
+                .subject(question.getSubject())
+                .content(question.getContent())
+                .answerList(question.getAnswerList())
+                .author(question.getAuthor())
+                .createDate(question.getCreateDate())
+                .modifyDate(question.getModifyDate())
+                .voter(question.getVoter())
+                .categoryId(question.getCategory().getId())
+                .build();
     }
 
     /**
      * 질문 저장
      * @param request - AddQuestionRequest DTO
      */
-    public void save(QuestionRequest request, SiteUser siteUser) {
+    public void save(QuestionRequest request, SiteUser siteUser, int categoryId) {
         // answerService의 save는 builder를 사용해서 AnswerResponse return
         // QuestionService의 save는 void
-        questionRepository.save(request.toEntityForAdd(LocalDateTime.now(), siteUser));
+        CategoryResponse categoryResponse = new CategoryResponse();
+        Category category = categoryResponse.toEntity(categoryId);
+
+        questionRepository.save(request.toEntityForAdd(LocalDateTime.now(), siteUser, category));
     }
 
     /**
@@ -56,11 +63,11 @@ public class QuestionService {
      * @param page
      * @return Page<QuestionResponse>
      */
-    public Page<QuestionResponse> findAll(int page, String kw) {
+    public Page<QuestionResponse> findAll(int page, String kw, int categoryId) {
         List<Sort.Order> sorts= new ArrayList<>();
         sorts.add(Sort.Order.desc("createDate"));
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-        return questionRepository.findAll(kw, pageable).map(QuestionResponse::new);
+        return questionRepository.findAll(kw, categoryId, pageable).map(QuestionResponse::new);
     }
 
     /**
@@ -69,13 +76,17 @@ public class QuestionService {
      * @param subject
      * @param content
      */
-    public void update(QuestionResponse question, String subject, String content) {
+    public void update(QuestionResponse question, String subject, String content, int categoryId) {
+        CategoryResponse categoryResponse = new CategoryResponse();
+        Category category = categoryResponse.toEntity(categoryId);
+
         QuestionRequest questionRequest
                 = QuestionRequest.builder()
                     .id(question.getId())
                     .subject(subject)
                     .content(content)
                     .author(question.getAuthor())
+                    .category(category)
                     .createDate(question.getCreateDate())
                     .modifyDate(LocalDateTime.now())
                     .build();
