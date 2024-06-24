@@ -8,6 +8,22 @@
       <div th:replace="~{form_errors :: formErrorsFragment}"></div>
       <!-- 검증 처리 끝 -->
       <div class="mb-3">
+        <label for="category" class="form-label">카테고리</label>
+        <select name="categoryId" id="category" class="form-select" aria-label="Default select example" th:unless="${question.categoryId != null}">
+          <option th:each="category : ${categoryList}"
+                  th:value="${category.id}"
+                  th:text="${category.categoryName}">
+          </option>
+        </select>
+        <select name="categoryId" id="categoryUpdate" class="form-select" aria-label="Default select example" th:if="${question.categoryId != null}">
+          <option th:each="category : ${categoryList}"
+                  th:value="${category.id}"
+                  th:text="${category.categoryName}"
+                  th:selected="${category.id} == ${question.categoryId}">
+          </option>
+        </select>
+      </div>
+      <div class="mb-3">
         <label for="subject" class="form-label">제목</label>
         <input type="text" id="subject" th:field="*{subject}" class="form-control">
       </div>
