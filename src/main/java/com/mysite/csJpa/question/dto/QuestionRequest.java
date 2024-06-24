@@ -1,5 +1,7 @@
 package com.mysite.csJpa.question.dto;
 
+import com.mysite.csJpa.category.Category;
+import com.mysite.csJpa.category.dto.CategoryResponse;
 import com.mysite.csJpa.question.Question;
 import com.mysite.csJpa.user.SiteUser;
 import jakarta.validation.constraints.NotEmpty;
@@ -24,6 +26,7 @@ public class QuestionRequest {
     private LocalDateTime createDate;
     private SiteUser author;
     private Set<SiteUser> voter;
+    private Category category;
 
     public Question toEntityForUpdate() {
         return Question.builder()
@@ -34,15 +37,17 @@ public class QuestionRequest {
                 .createDate(createDate)
                 .modifyDate(modifyDate)
                 .voter(voter)
+                .category(category)
                 .build();
     }
 
-    public Question toEntityForAdd(LocalDateTime createDate, SiteUser author) {
+    public Question toEntityForAdd(LocalDateTime createDate, SiteUser author, Category category) {
         return Question.builder()
                 .subject(subject)
                 .content(content)
                 .createDate(createDate)
                 .author(author)
+                .category(category)
                 .build();
     }
 }

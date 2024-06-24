@@ -2,13 +2,13 @@ package com.mysite.csJpa.question;
 
 
 import com.mysite.csJpa.answer.Answer;
+import com.mysite.csJpa.category.Category;
 import com.mysite.csJpa.comment.Comment;
 import com.mysite.csJpa.user.SiteUser;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,9 +44,12 @@ public class Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     private List<Comment> commentList;
 
+    @ManyToOne
+    private Category category;
+
 
     @Builder
-    public Question(int id, String content, String subject, LocalDateTime createDate, List<Answer> answerList, SiteUser author, LocalDateTime modifyDate, Set<SiteUser> voter, List<Comment> commentList) {
+    public Question(int id, String content, String subject, LocalDateTime createDate, List<Answer> answerList, SiteUser author, LocalDateTime modifyDate, Set<SiteUser> voter, List<Comment> commentList, Category category) {
         this.id = id;
         this.content = content;
         this.subject = subject;
@@ -56,6 +59,7 @@ public class Question {
         this.modifyDate = modifyDate;
         this.voter = voter;
         this.commentList = commentList;
+        this.category = category;
     }
 
 }
