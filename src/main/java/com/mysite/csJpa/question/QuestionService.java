@@ -3,15 +3,16 @@ package com.mysite.csJpa.question;
 import com.mysite.csJpa.DataNotFoundException;
 import com.mysite.csJpa.category.Category;
 import com.mysite.csJpa.category.dto.CategoryResponse;
+import com.mysite.csJpa.common.paging.RequestList;
+import com.mysite.csJpa.common.paging.SearchDto;
 import com.mysite.csJpa.question.dto.*;
+import com.mysite.csJpa.question.mapper.QuestionMapper;
 import com.mysite.csJpa.user.SiteUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.List;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
+    private final QuestionMapper questionMapper;
 
     /**
      * 질문 상세
@@ -62,13 +64,14 @@ public class QuestionService {
      * 전체 질문 List
      * @param page
      * @return Page<QuestionResponse>
-     */
+
     public Page<QuestionResponse> findAll(int page, String kw, int categoryId) {
         List<Sort.Order> sorts= new ArrayList<>();
         sorts.add(Sort.Order.desc("createDate"));
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
         return questionRepository.findAll(kw, categoryId, pageable).map(QuestionResponse::new);
     }
+     */
 
     /**
      * 질문 수정
@@ -121,6 +124,26 @@ public class QuestionService {
                     .build();
 
         questionRepository.save(questionRequest.toEntityForUpdate());
+    }
+
+    /**
+     * 전체 목록
+     * @param params
+     * @param pageable
+     * @return
+     */
+    public Page<QuestionResponse> findAll(SearchDto params, Pageable pageable) {
+
+        RequestList<?> requestList = RequestList.builder()
+                .pageable(pageable)
+                .data(params)
+                .build();
+
+        List<QuestionResponse> content = questionMapper.findAll(requestList);
+
+        int total = questionMapper.getQuestionCount(params);
+
+        return new PageImpl<>(content, pageable, total);
     }
 
 }
