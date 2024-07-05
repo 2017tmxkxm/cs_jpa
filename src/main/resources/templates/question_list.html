@@ -9,13 +9,14 @@
             <div class="col-6">
                 <div class="input-group">
                     <select class="form-select" id="category" aria-label="Default select example">
+                        <option th:value="0">전체</option>
                         <option th:each="category : ${categoryList}"
                                 th:value="${category.id}"
                                 th:selected="${category.id} == ${categoryId}"
                                 th:text="${category.categoryName}">
                         </option>
                     </select>
-                    <input type="text" id="search_kw" class="form-control" th:value="${kw}">
+                    <input type="text" id="search_subject" class="form-control" th:value="${subject}">
                     <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
                 </div>
             </div>
@@ -36,16 +37,13 @@
                     <td class="text-start">
                         <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.subject}"></a>
                         <span class="text-danger small ms-2"
-                              th:if="${#lists.size(question.answerList) > 0}"
-                              th:text="${#lists.size(question.answerList)}">
+                              th:if="${question.answerCnt> 0}"
+                              th:text="${question.answerCnt} + ${question.commentCnt}">
                         </span>
                     </td>
-                    <td th:if="${question.category != null} and ${question.category.id == 1}">JAVA</td>
-                    <td th:if="${question.category != null} and ${question.category.id == 2}">Algorithm</td>
-                    <td th:if="${question.category != null} and ${question.category.id == 3}">Python</td>
-                    <td th:if="${question.category != null} and ${question.category.id == 4}">Thymeleaf</td>
-                    <td th:if="${question.category == null}">공통</td>
-                    <td><span th:if="${question.author != null}" th:text="${question.author.username}"></span></td>
+                    <td th:if="${question.categoryName != null}" th:text="${question.categoryName}"></td>
+                    <td th:if="${question.categoryName == null}">공통</td>
+                    <td th:text="${question.username}"></td>
                     <td th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"></td>
                 </tr>
             </tbody>
@@ -72,7 +70,7 @@
         </div>
         <!-- 페이징처리 끝 -->
         <form th:action="@{/question/list}" method="get" id="searchForm">
-            <input type="hidden" id="kw" name="kw" th:value="${kw}">
+            <input type="hidden" id="subject" name="subject" th:value="${subject}">
             <input type="hidden" id="categoryId" name="categoryId" th:value="${categoryId}">
             <input type="hidden" id="page" name="page" th:value="${paging.number}">
         </form>
@@ -88,7 +86,7 @@
         });
         const btn_search = document.getElementById("btn_search");
         btn_search.addEventListener('click', function() {
-            document.getElementById('kw').value = document.getElementById('search_kw').value;
+            document.getElementById('subject').value = document.getElementById('search_subject').value;
             document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
             document.getElementById('categoryId').value = document.getElementById('category').value;
             document.getElementById('searchForm').submit();
