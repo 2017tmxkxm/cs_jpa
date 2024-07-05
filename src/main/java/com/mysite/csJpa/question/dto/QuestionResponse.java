@@ -23,11 +23,16 @@ public class QuestionResponse {
     private String content;
     private List<Answer> answerList;
     private SiteUser author;
+    // 추가 QuestionMapper에서 username으로 내려주기 때문에
+    private String username;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
     Set<SiteUser> voter;
     private Category category;
-    private Integer categoryId;
+    private int categoryId;
+    private String categoryName;
+    private int answerCnt;
+    private int commentCnt;
 
     public QuestionResponse(Question question) {
         this.id = question.getId();
