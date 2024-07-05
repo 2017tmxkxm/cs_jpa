@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mysite.csJpa.question.mapper.QuestionMapper">
+
+    <select id="findAll" resultType="QuestionResponse" parameterType="RequestList">
+        /* findAll */
+        SELECT
+            a.id
+            , a.subject
+            , a.content
+            , a.create_date
+            , a.category_id
+            , b.id
+            , b.category_name AS categoryName
+            , c.username
+            , (SELECT count(*) FROM answer where a.id = question_id) AS answerCnt
+            , (SELECT count(*) FROM comment where a.id = question_id) AS commentCnt
+        FROM
+            question a
+        LEFT JOIN category b ON a.category_id = b.id
+        LEFT JOIN site_user c ON a.author_id = c.id
+        WHERE 1=1
+            <if test="data.subject != null and data.subject != ''">
+                and a.subject like concat('%', #{data.subject}, '%')
+            </if>
+            <if test="data.categoryId != 0">
+                and b.id = #{data.categoryId}
+            </if>
+        ORDER BY a.create_date DESC
+        OFFSET #{pageable.offset} ROWS FETCH NEXT #{pageable.pageSize} ROWS ONLY
+    </select>
+
+    <select id="getQuestionCount" parameterType="QuestionResponse" resultType="int">
+        SELECT COUNT(*) AS CNT
+        FROM question a
+        LEFT JOIN category b ON a.category_id = b.id
+        LEFT JOIN site_user c ON a.author_id = c.id
+        WHERE 1=1
+            <if test="subject != null and subject != ''">
+                and a.subject like concat('%', #{subject}, '%')
+            </if>
+            <if test="categoryId != 0">
+                and a.category_id = #{categoryId}
+            </if>
+    </select>
+</mapper>
