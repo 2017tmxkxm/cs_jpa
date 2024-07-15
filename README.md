@@ -29,7 +29,7 @@
 3. 프로필 화면 구현
 
 ### 답변 기능, 검색, 페이징 구현 과정은 블로그에 기술했습니다.
-아래 이미지를 클릭하면 블로그로 이동하게 됩니다.
+아래 이미지를 클릭하면 블로그로 이동하게 됩니다. <br>
 [![블로그](https://github.com/user-attachments/assets/420fccee-1644-4a10-ada8-f88fac4962ce)](https://letsjustdoitt.tistory.com/category/spring/%EC%A0%90%ED%94%84%20%ED%88%AC%20%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8)
 
 
